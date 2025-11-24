@@ -88,6 +88,7 @@ public class GAMEUNLOCKER implements IXposedHookLoadPackage {
     private static final String[] packagesToChangeF5 = {
         "com.dts.freefiremax",
         "com.dts.freefireth",
+        "com.liuzh.deviceinfo",
         "com.mobile.legends"
     };
 
@@ -203,8 +204,8 @@ public class GAMEUNLOCKER implements IXposedHookLoadPackage {
     private static void propsToChangeF5() {
         setPropValue("BRAND", "realme");
         setPropValue("MANUFACTURER", "realme");
-        setPropValue("DEVICE", "rmx2193");
-        setPropValue("MODEL", "Realme P3");
+        setPropValue("DEVICE", "Realme p3");
+        setPropValue("MODEL", "rmx2193");
     }
 
     // Sony
