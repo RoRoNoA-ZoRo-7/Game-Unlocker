@@ -7,19 +7,19 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Sign with debug key
       run: |
         sed -i "19i signingConfig signingConfigs.debug" ./app/build.gradle
-        curl -so- https://raw.githubusercontent.com/artem-zinnatullin/RxJavaProGuardRules/master/rxjava-proguard-rules/proguard-rules.txt | tee -a ./app/proguard-rules.pro
+        curl -s https://raw.githubusercontent.com/artem-zinnatullin/RxJavaProGuardRules/master/rxjava-proguard-rules/proguard-rules.txt | tee -a ./app/proguard-rules.pro
         cat ./app/proguard-rules.pro
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
+        distribution: 'temurin'  # Adopt is deprecated, use temurin now
         java-version: '11'
-        distribution: 'adopt'
         cache: gradle
 
     - name: Grant execute permission for gradlew
@@ -33,34 +33,20 @@ jobs:
 
     - name: Get App Version Name
       id: version
-      run: echo "::set-output name=app_version::$(grep versionName app/build.gradle | sed -n 's/.*versionName \"\([0-9.]*\)\".*/\1/p')"
+      run: echo "app_version=$(grep versionName app/build.gradle | sed -n 's/.*versionName \"\([0-9.]*\)\".*/\1/p')" >> $GITHUB_ENV
 
     - name: Rename APK
-      run: mv app/build/outputs/apk/debug/app-debug.apk game-unlocker-v${{ steps.version.outputs.app_version }}.apk
+      run: mv app/build/outputs/apk/debug/app-debug.apk game-unlocker-v${{ env.app_version }}.apk
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v2
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
       with:
         name: Game Unlocker
-        path: game-unlocker-v${{ steps.version.outputs.app_version }}.apk
+        path: game-unlocker-v${{ env.app_version }}.apk
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        files: game-unlocker-v${{ steps.version.outputs.app_version }}.apk
-        tag_name: ${{ steps.version.outputs.app_version }}
-        release_name: ${{ steps.version.outputs.app_version }}
-        prerelease: false
+    - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Upload Release Assets
       run: |
-        release_id=${{ steps.create_release.outputs.id }}
-        asset_url=$(curl -X POST \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Content-Type: application/octet-stream" \
-          --data-binary "@game-unlocker-v${{ steps.version.outputs.app_version }}.apk" \
-          "https://uploads.github.com/repos/${{ github.repository }}/releases/$release_id/assets?name=game-unlocker-v${{ steps.version.outputs.app_version }}.apk")
-        echo "Uploaded asset: $asset_url"
+        gh release create ${{ env.app_version }} game-unlocker-v${{ env.app_version }}.apk --title "${{ env.app_version }}" --notes "Automated release created by GitHub Actions"
+
