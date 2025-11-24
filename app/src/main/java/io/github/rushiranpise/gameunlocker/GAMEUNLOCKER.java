@@ -84,7 +84,7 @@ public class GAMEUNLOCKER implements IXposedHookLoadPackage {
         "com.tencent.tmgp.sgame"
     };
 
-    // Packages to Spoof as POCO F5
+    // Packages to Spoof as Realme P3
     private static final String[] packagesToChangeF5 = {
         "com.dts.freefiremax",
         "com.dts.freefireth",
@@ -138,10 +138,10 @@ public class GAMEUNLOCKER implements IXposedHookLoadPackage {
             XposedBridge.log("Spoofed " + packageName + " as OnePlus 9 Pro");
         }
 
-        // Poco
+        // Realme
         if (Arrays.asList(packagesToChangeF5).contains(packageName)) {
             propsToChangeF5();
-            XposedBridge.log("Spoofed " + packageName + " as Poco F5");
+            XposedBridge.log("Spoofed " + packageName + " as Realme P3");
         }
 
         // Sony
@@ -198,11 +198,13 @@ public class GAMEUNLOCKER implements IXposedHookLoadPackage {
         setPropValue("MODEL", "LE2123");
     }
 
-    //Poco
-    // Props to Spoof as Poco F5
+    // Realme
+    // Props to Spoof as Realme p3
     private static void propsToChangeF5() {
-        setPropValue("MANUFACTURER", "Xiaomi");
-        setPropValue("MODEL", "23049PCD8G");
+        setPropValue("BRAND", "realme");
+        setPropValue("MANUFACTURER", "realme");
+        setPropValue("DEVICE", "rmx2193");
+        setPropValue("MODEL", "Realme P3");
     }
 
     // Sony
